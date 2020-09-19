@@ -61,6 +61,8 @@ http_get_data(const char* url, size_t *data_size)
 
 	curl_easy_cleanup(curl);
 
+	result[data.size] = '\0'; /* \0 terminate data buffer  */
+
 	return result;
 }
 

@@ -11,9 +11,9 @@ LDFLAGS =
 LIB_LDFLAGS = -shared
 
 DEPS = rates.h
-OBJ = http_get_data.o
+OBJ = http_get_data.o get_rates.o
 
-TEST_OBJ = test1.o
+TEST_OBJ = test1.o test2.o
 
 CURL_FLAGS != curl-config --cflags
 CURL_LDFLAGS != curl-config --libs
@@ -57,7 +57,7 @@ clean-lib:
 	rm $(DIR_LIB)/$(LIB)
 
 .PHONY: tests
-tests: test1
+tests: test1 test2
 
 test1: test1.o $(OBJ)
 	@echo "Create directory" $(DIR_TEST)
@@ -69,7 +69,20 @@ test1.o: test1.c $(DEPS)
 	@echo "Compiling" $<
 	$(CC) $(CFLAGS) -o $@ $<
 
+test2: test2.o $(OBJ)
+	@echo "Create directory" $(DIR_TEST)
+	mkdir -p $(DIR_TEST)
+	@echo "Linking and create executable" $@
+	$(CC) -o $(DIR_TEST)/$@ $(LDFLAGS) $(OBJ) test2.o
+
+test2.o: test2.c $(DEPS)
+	@echo "Compiling" $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 http_get_data.o: http_get_data.c $(DEPS)
+	@echo "Compiling" $<
+	$(CC) $(CFLAGS) $(LIB_CFLAGS) -o $@ $<
+
+get_rates.o: get_rates.c $(DEPS)
 	@echo "Compiling" $<
 	$(CC) $(CFLAGS) $(LIB_CFLAGS) -o $@ $<
