@@ -225,11 +225,16 @@ set_url(Date start_at, Date end_at,
 
 	if (n_currencies > 1) {
 		int i = n_currencies - 1;
-		char sym[STR_CURR_SIZE];
+		char sym[STR_CURR_SIZE + 1]; /* allow for \0 */
 		strncpy(symbols, URI_SYMBOLS, STR_SYMBOLS_SIZE - 1);
 		
 		while (i > 0) {
-			snprintf(sym, STR_CURR_SIZE + 1, "%s", currencies[i--]);
+			int ret = snprintf(sym, sizeof(sym), "%s", currencies[i--]);
+			if (ret < 0 || ret > sizeof(sym)) {
+				fprintf(stderr, "Currency not well formated: %s",
+					currencies[i + 1]);
+				exit(1);
+			}
 			strncat(symbols, sym, STR_SYMBOLS_SIZE - 1);
 			if (i != 0)
 				strncat(symbols, ",", STR_SYMBOLS_SIZE - 1);
