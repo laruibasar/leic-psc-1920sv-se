@@ -251,7 +251,7 @@ set_url(Date start_at, Date end_at,
 		strncpy(symbols, URI_SYMBOLS, STR_SYMBOLS_SIZE - 1);
 		
 		while (i > 0) {
-			snprintf(sym, STR_SYMBOLS_SIZE, "%s", currencies[i--]);
+			snprintf(sym, STR_CURR_SIZE, "%s", currencies[i--]);
 			strncat(symbols, sym, STR_SYMBOLS_SIZE - 1);
 			if (i != 0)
 				strncat(symbols, ",", STR_SYMBOLS_SIZE - 1);
