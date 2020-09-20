@@ -28,7 +28,7 @@ DIR_TEST = ../tests
 DIR_BUILD = ../build
 DIR_LIB = $(DIR_BUILD)/lib
 
-APP_LDFLAGS = -L$(DIR_LIB) -l$(LIB_NAME)
+APP_LDFLAGS = -L$(PWD)/$(DIR_LIB) -l$(LIB_NAME) -R$(PWD)/$(DIR_LIB)
 
 .PHONY: all
 all: lib app tests
@@ -48,13 +48,21 @@ clean: clean-lib clean-app clean-tests
 
 clean-tests:  
 	@echo "Cleaning tests *.o"
-	rm $(TEST_OBJ)
+	rm -f $(TEST_OBJ)
 	@echo "Cleaning executable tests files"
-	rm $(DIR_TEST)/*
+	rm -f $(DIR_TEST)/*
 
 clean-lib:
 	@echo "Cleaning lib"
-	rm $(DIR_LIB)/$(LIB)
+	rm -f $(DIR_LIB)/$(LIB)
+	@echo "Cleaning lib *.o"
+	rm -f $(OBJ)
+
+clean-app:
+	@echo "Cleaning app"
+	rm -f $(DIR_BUILD)/$(APP)
+	@echo "Cleaning app *.o"
+	rm -f rates.o
 
 .PHONY: tests
 tests: test1 test2
@@ -86,3 +94,14 @@ http_get_data.o: http_get_data.c $(DEPS)
 get_rates.o: get_rates.c $(DEPS)
 	@echo "Compiling" $<
 	$(CC) $(CFLAGS) $(LIB_CFLAGS) -o $@ $<
+
+rates: rates.o
+	@echo "Create directory " $(DIR_BUILD)
+	mkdir -p $(DIR_BUILD)
+	@echo "Linking and creating executable " $@
+	$(CC) $(APP_LDFLAGS) -o $(DIR_BUILD)/$@ rates.o
+
+rates.o: rates.c $(DEPS)
+	@echo "Compiling " $< 
+	$(CC) $(CFLAGS) -o $@ $<
+
