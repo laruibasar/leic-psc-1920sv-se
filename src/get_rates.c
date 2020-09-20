@@ -39,9 +39,9 @@ get_rates(Date start_at, Date end_at,
 
 	int rates = extract_rates(get, size, result);
 	free(get);
-	if (rates < 0) {
+	
+	if (rates < 0)
 		return E_EXTR_JSON;
-	}
 	
 	return 0;
 }
@@ -49,12 +49,17 @@ get_rates(Date start_at, Date end_at,
 void
 free_rates(Rates *rates)
 {
-	/* clear dates */
-	free(&rates->start_at);
-	free(&rates->end_at);
-
 	/* clear base string */
 	free(rates->base);
+
+	/* clear currency names */
+	for (int i = 0; i < rates->count; i++) {
+		struct rate *r = &rates->rates[i];
+		for (int j = 0; j < r->count; j++) {
+			struct currency *c = &r->currencies[j];
+			free(c->name);
+		}
+	}
 }
 
 int
