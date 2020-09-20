@@ -230,7 +230,7 @@ set_url(Date start_at, Date end_at,
 		
 		while (i > 0) {
 			int ret = snprintf(sym, sizeof(sym), "%s", currencies[i--]);
-			if (ret < 0 || ret > sizeof(sym)) {
+			if (ret < 0 || ret >= sizeof(sym)) {
 				fprintf(stderr, "Currency not well formated: %s",
 					currencies[i + 1]);
 				exit(1);
