@@ -42,7 +42,9 @@ get_rates(Date start_at, Date end_at,
 	
 	if (rates < 0)
 		return E_EXTR_JSON;
-	
+
+	result->start_at = start_at;
+	result->end_at = end_at;
 	return 0;
 }
 
@@ -81,27 +83,7 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 		return -1;
 	}
 	
-	json_t *start, *end, *base;
-	Date *dt_start, *dt_end;
-
-	if ((dt_start = malloc(sizeof(Date))) == NULL) {
-		fprintf(stderr, "Out of memory for date set");
-		json_decref(root);
-		return -1;
-	}
-
-	if ((dt_end = malloc(sizeof(Date))) == NULL) {
-		fprintf(stderr, "Out of memory for date set");
-		json_decref(root);
-		return -1;
-	}
-
-	start = json_object_get(root, "start_at");
-	*dt_start = convert_date(json_string_value(start));
-
-	end = json_object_get(root, "end_at");
-	*dt_end = convert_date(json_string_value(end));
-
+	json_t *base;
 	base = json_object_get(root, "base");
 	char *base_curr = str_from_json(json_string_value(base));
 
@@ -130,15 +112,8 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 			json_decref(root);
 			return -1;
 		}
-
-		Date *day;
-		if ((day = malloc(sizeof(Date))) == NULL) {
-			fprintf(stderr, "Out of memory for day");
-			json_decref(root);
-			return -1;
-		}
-		*day = convert_date(key);
-		r->day = *day;
+		
+		r->day = convert_date(key);
 
 		size_t size = json_object_size(value);
 		r->count = size;
@@ -178,8 +153,6 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 	/* cleaning json_t */
 	json_decref(root);
 
-	extract_rates->start_at = *dt_start;
-	extract_rates->end_at = *dt_end;
 	extract_rates->rates = result_rates;
 	extract_rates->count = number_rates;
 	extract_rates->base = base_curr;
@@ -256,7 +229,7 @@ set_url(Date start_at, Date end_at,
 		strncpy(symbols, URI_SYMBOLS, STR_SYMBOLS_SIZE - 1);
 		
 		while (i > 0) {
-			snprintf(sym, STR_CURR_SIZE, "%s", currencies[i--]);
+			snprintf(sym, STR_CURR_SIZE + 1, "%s", currencies[i--]);
 			strncat(symbols, sym, STR_SYMBOLS_SIZE - 1);
 			if (i != 0)
 				strncat(symbols, ",", STR_SYMBOLS_SIZE - 1);

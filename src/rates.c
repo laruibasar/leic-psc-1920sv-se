@@ -73,8 +73,8 @@ main(int argc, char *argv[])
 		}
 	}
 
-	free_rates(&rates);
 	fclose(fp);
+	free_rates(&rates);
 
 	exit(0);
 }

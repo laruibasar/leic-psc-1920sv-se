@@ -45,13 +45,7 @@ main(int argc, char *argv[])
 	}
 	printf("Call get_rates: %d\n", status);
 
-	Date st = rates.start_at;
-	Date ed = rates.end_at;
-
-	printf("Start: %d-%d-%d\tEnd: %d-%d-%d\tBase: %s\n", 
-		st.year, st.month, st.day,
-		ed.year, ed.month, ed.day,
-		rates.base);
+	printf("Base: %s\n", rates.base);
 	for (int i = 0; i < rates.count; i++) {
 		struct rate r = rates.rates[i];
 		for (int j = 0; j < r.count; j++) {
