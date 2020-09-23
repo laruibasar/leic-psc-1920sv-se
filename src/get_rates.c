@@ -61,7 +61,9 @@ free_rates(Rates *rates)
 			struct currency *c = &r->currencies[j];
 			free(c->name);
 		}
+		free(r->currencies);
 	}
+	free(rates->rates);
 }
 
 int
@@ -106,12 +108,7 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 
 	int count_rate = 0;
 	json_object_foreach(rates, key, value) {
-		struct rate *r;
-		if ((r = malloc(sizeof(struct rate))) == NULL) {
-			fprintf(stderr, "Out of memory for rate");
-			json_decref(root);
-			return -1;
-		}
+		struct rate *r = &result_rates[count_rate];
 		
 		r->day = convert_date(key);
 
@@ -130,12 +127,7 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 		json_t *sub_value;
 		void *iter = json_object_iter(value);
 		while (iter != NULL) {
-			struct currency *cur = malloc(sizeof(struct currency));
-			if (cur == NULL) {
-				fprintf(stderr, "Out of memory for currency");
-				json_decref(root);
-				return -1;
-			}
+			struct currency *cur = &currencies[count_curr];
 			sub_key = json_object_iter_key(iter);
 			sub_value = json_object_iter_value(iter);
 			char *name = str_from_json(sub_key);
@@ -143,11 +135,11 @@ extract_rates(const char *data, size_t size, Rates *extract_rates)
 			cur->name = name;
 			cur->value = json_real_value(json_object_iter_value(iter));
 		
-			currencies[count_curr++] = *cur;
+			count_curr++;
 			iter = json_object_iter_next(value, iter);
 		}
 		r->currencies = currencies;
-		result_rates[count_rate++] = *r;
+		count_rate++;
 	}
 
 	/* cleaning json_t */
